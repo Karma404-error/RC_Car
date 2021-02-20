@@ -24,10 +24,10 @@ String Back = "Back";
 String Stop = "Stop";
 String f_Right = "Forward Right";
 String Right = "Right";
-//String b_Right = "Back Right";
+String b_Right = "Back Right";
 String f_Left = "Forward Left";
 String Left = "Left";
-//String b_Left = "Back Left";
+String b_Left = "Back Left";
 /*
 // Delay values, can be altered and optimized during the testing phase
 int mini_delay = 100
@@ -85,12 +85,12 @@ void loop() {
        delay(100);  
     }
     if blueData == 'H'{ //Back Left
-       //Code TBC
+       turn(b_Left);
        Serial.println("Moving Back and Left now..");
        delay(100);  
     }
     if blueData == 'J'{ //Back Right
-       //Code TBC
+       turn(b_Right);
        Serial.println("Moving Back and Right now..");
        delay(100);  
     }
@@ -198,6 +198,32 @@ void turn(String Mode){
     digitalWrite(back_m2p2, LOW);
     
   }else if (Mode == f_Right){
+    // Front motor 1: Counter-Clockwise, Front motor 2: Stationary
+    digitalWrite(front_m1p1, LOW);
+    digitalWrite(front_m1p2, HIGH);
+    digitalWrite(front_m2p1, LOW);
+    digitalWrite(front_m2p2, LOW);
+
+    // Back motor 1: Counter-Clockwise, Back motor 2: Stationary
+    digitalWrite(back_m1p1, LOW);
+    digitalWrite(back_m1p2, HIGH);
+    digitalWrite(back_m2p1, LOW);
+    digitalWrite(back_m2p2, LOW);
+    
+  }else if (Mode == b_Left){
+      // Front motor 1: Stationary, Front motor 2: Counter-Clockwise
+    digitalWrite(front_m1p1, LOW);
+    digitalWrite(front_m1p2, LOW);
+    digitalWrite(front_m2p1, LOW);
+    digitalWrite(front_m2p2, HIGH);
+
+    // Back motor 1: Stationary, Back motor 2: Counter-Clockwise
+    digitalWrite(back_m1p1, LOW);
+    digitalWrite(back_m1p2, LOW);
+    digitalWrite(back_m2p1, LOW);
+    digitalWrite(back_m2p2, HIGH);
+    
+  }else if (Mode == b_Right){
     // Front motor 1: Clockwise, Front motor 2: Stationary
     digitalWrite(front_m1p1, HIGH);
     digitalWrite(front_m1p2, LOW);
