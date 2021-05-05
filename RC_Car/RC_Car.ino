@@ -6,28 +6,39 @@
 
 // Initialize front motors 1 and 2; Motor 1 is on the left and Motor 2 is on the right
 // When viewed from above the car with the car's front facing away from the observer
-int front_m1p1 = 1;
-int front_m1p2 = 2;
-int front_m2p1 = 3;
-int front_m2p2 = 4;
+// For speed control, must use PMW Pins: 3, 5, 6, 9, 10, 11
+int front_m1p1 = 1; // IN1
+int front_m1p2 = 2; // IN2
+int fm1_speed = 3; //Speed control for left front motor : ENA
+
+int front_m2p1 = 4; //IN3
+int front_m2p2 = 5; //IN4
+int fm2_speed = 6; //Speed control for right front motor : ENB
 
 // Initialize back motors 1 and 2; Motor 1 is on the left and Motor 2 is on the right
 // When viewed from above the car with the car's front facing away from the observer
-int back_m1p1 = 5;
-int back_m1p2 = 6;
-int back_m2p1 = 7;
-int back_m2p2 = 8;
+int back_m1p1 = 7; //IN1
+int back_m1p2 = 8; //IN2
+int bm1_speed = 9; //Speed control for left back motor : ENA
+
+int back_m2p1 = 10; //IN3
+int back_m2p2 = 12; //IN4
+int bm2_speed = 11; //Speed control for right back motor : ENB
 
 //Initialize movement keyword variables
 String Forward = "Forward"; 
 String Back = "Back";
 String Stop = "Stop";
-String f_Right = "Forward Right";
 String Right = "Right";
-String b_Right = "Back Right";
-String f_Left = "Forward Left";
 String Left = "Left";
-String b_Left = "Back Left";
+
+//Initialize max, min, actual and reduced factor of the car (255 -> 5 volts)
+//Actual speed -> speed received from bluetooth module; Reduced factor -> used to
+// find new speed of the wheels on the side of the turn to spin slower
+int max_speed = 255;
+int min_speed = 0;
+int actual_speed = min_speed; //Car begins stationary
+
 /*
 // Delay values, can be altered and optimized during the testing phase
 int mini_delay = 100
@@ -36,7 +47,7 @@ int medium_delay = 500
 int long_delay = 1000
 */
 // Initialize bluetooth connection
-SoftwareSerial Blue(9,10); // RX pin 9; TX pin 10
+SoftwareSerial Blue(19,18); // RX pin 19; TX pin 18 -> arduino MEGA
 char blueData; //Bluetooth data will be stored here
 // RX pin receives data while TX pin transmits data
 
@@ -45,14 +56,20 @@ void setup() {
   //Set front motor pins to output mode
   pinMode(front_m1p1, OUTPUT);
   pinMode(front_m1p2, OUTPUT);
+  pinMode(fm1_speed, OUTPUT);
   pinMode(front_m2p1, OUTPUT);
   pinMode(front_m2p2, OUTPUT);
+  pinMode(fm2_speed, OUTPUT);
 
   //Set back motor pins to output mode
   pinMode(back_m1p1, OUTPUT);
   pinMode(back_m1p2, OUTPUT);
+  pinMode(bm1_speed, OUTPUT);
   pinMode(back_m2p1, OUTPUT);
   pinMode(back_m2p2, OUTPUT);
+  pinMode(bm2_speed, OUTPUT);
+
+  speed_control(min_speed); //Set car to stationary at the beginning
 
   //Set up bluetooth signal and begin reading
   Serial.begin(9600);
@@ -62,58 +79,76 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 
-  if (Blue.available()){
-    blueData = Blue.read();
-    if blueData == 'F'{ //Forward
+ if (Blue.available()){
+  blueData = Blue.read();
+  
+    // BLUETOOTH SPEED CONTROL RECEIVER PLACE FOR SPEEDS 0 TO 100
+    // SET actual_speed variable to the received speed through analogwrite(pin, speed): speed ranges from 0% to 255 where 0 -> 0, and 100% -> 255
+    // call the "speed_control" function, it takes in one input: actual_speed
+    // INSERT HERE
+
+    
+  if (blueData == 'F'){ //Forward
       movement(Forward);
-      Serial.println("Moving Forward now..");
+      //Serial.println("Moving Forward now..");
       delay(100);
     }
-    if blueData == 'G'{ //Forward Left
+    if (blueData == 'G'){ //Forward Left
       turn(f_Left);
-      Serial.println("Moving Forward and Left now..");
+      //Serial.println("Moving Forward and Left now..");
       delay(100);
     }
-    if blueData == 'I'{ //Forward Right
+    if (blueData == 'I'){ //Forward Right
       turn(f_Right);
-      Serial.println("Moving Forward and Right now..");
+      //Serial.println("Moving Forward and Right now..");
       delay(100);
     }
-    if blueData == 'B'{ //Back
+    if (blueData == 'B'){ //Back
        movement(Back);
-       Serial.println("Moving Back now..");
+       //Serial.println("Moving Back now..");
        delay(100);  
     }
-    if blueData == 'H'{ //Back Left
+    if (blueData == 'H'){ //Back Left
        turn(b_Left);
-       Serial.println("Moving Back and Left now..");
+       //Serial.println("Moving Back and Left now..");
        delay(100);  
     }
-    if blueData == 'J'{ //Back Right
+    if (blueData == 'J'){ //Back Right
        turn(b_Right);
-       Serial.println("Moving Back and Right now..");
+       //Serial.println("Moving Back and Right now..");
        delay(100);  
     }
-    if blueData == 'L'{ //Left
+    if (blueData == 'L'){ //Left
        turn(Left);
-       Serial.println("Moving Left now..");
+       //Serial.println("Moving Left now..");
        delay(100);  
     }
-    if blueData == 'R'{ //Right
+    if (blueData == 'R'){ //Right
        turn(Right);
-       Serial.println("Moving Right now..");
+       //Serial.println("Moving Right now..");
        delay(100);  
     }
-    if blueData == ('S' or 'D'){ //Stop or turn everything OFF
+    if ((blueData == 'D') or (blueData == 'S')){ //Stop or turn everything OFF
       movement(Stop);
-      Serial.println("Stopped and stationary..");
+      //Serial.println("Stopped and stationary..");
       delay(200);  
     }
+    
   }else{
     Serial.println("Attempting to receive a command..");
     delay(100);
-  }
+ }
 }
+
+//Function that changes the speed of the car wheels
+void speed_control(int speed_in){
+  analogWrite(fm1_speed, speed_in); 
+  analogWrite(fm2_speed, speed_in);
+  analogWrite(bm1_speed, speed_in);
+  analogWrite(bm2_speed, speed_in);
+}
+
+
 
 //Function that controls the movement of the car. Takes in inputs: Forward, Back and Stop
 void movement(String Mode){
@@ -157,7 +192,6 @@ void movement(String Mode){
   }
 }
 
-//Function for the turning of the car, takes in a string input of Front Left, Left, Back Left or Front Right, Right, Back Right
 void turn(String Mode){
   if (Mode == Right){
     // Front motor 1: Counter Clockwise, Front motor 2: Counter Clockwise
