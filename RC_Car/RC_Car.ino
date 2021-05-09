@@ -81,7 +81,7 @@ void loop() {
  if (Blue.available()){
   blueData = Blue.read();
 
-  if ((int) blueData >= 0 || (int) blueData < 9){
+  if ((int) blueData >= 0 && (int) blueData <= 9){
     //Multiply by 10 to get speed, then by 2.55 to convert from 0->100 to 0->255
     //Add 0.5 for rounding purposes then change it to an int which truncates it
     speed_control((int)((((float) blueData) * 25.5) + 0.5));
