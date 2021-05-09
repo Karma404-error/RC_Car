@@ -33,8 +33,7 @@ String Right = "Right";
 String Left = "Left";
 
 //Initialize max, min, actual and reduced factor of the car (255 -> 5 volts)
-//Actual speed -> speed received from bluetooth module; Reduced factor -> used to
-// find new speed of the wheels on the side of the turn to spin slower
+//Actual speed -> speed received from bluetooth module
 int max_speed = 255;
 int min_speed = 0;
 int actual_speed = min_speed; //Car begins stationary
@@ -72,7 +71,7 @@ void setup() {
   speed_control(min_speed); //Set car to stationary at the beginning
 
   //Set up bluetooth signal and begin reading
-  Serial.begin(9600);
+  //Serial.begin(9600);
   Blue.begin(9600); 
 }
 
@@ -81,14 +80,16 @@ void loop() {
 
  if (Blue.available()){
   blueData = Blue.read();
-  
-    // BLUETOOTH SPEED CONTROL RECEIVER PLACE FOR SPEEDS 0 TO 100
-    // SET actual_speed variable to the received speed through analogwrite(pin, speed): speed ranges from 0% to 255 where 0 -> 0, and 100% -> 255
-    // call the "speed_control" function, it takes in one input: actual_speed
-    // INSERT HERE
 
-    
-  if (blueData == 'F'){ //Forward
+  if ((int) blueData >= 0 || (int) blueData < 9){
+    //Multiply by 10 to get speed, then by 2.55 to convert from 0->100 to 0->255
+    //Add 0.5 for rounding purposes then change it to an int which truncates it
+    speed_control((int)((((float) blueData) * 25.5) + 0.5));
+   }
+   if (blueData == 'q'){
+    speed_control(max_speed);
+    }
+    if (blueData == 'F'){ //Forward
       movement(Forward);
       //Serial.println("Moving Forward now..");
       delay(100);
@@ -135,7 +136,7 @@ void loop() {
     }
     
   }else{
-    Serial.println("Attempting to receive a command..");
+    //Serial.println("Attempting to receive a command..");
     delay(100);
  }
 }
