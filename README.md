@@ -1,7 +1,7 @@
 # RC_Car
 The Arduino (MEGA board) code for the UTTS's club RC bluetooth controlled car through an available android app.
 
-The code was built around an RC car (Version 1) designed for the UTTS (University of Toronto Technical Specialists) club as our first major design project. The car is designed using generative design, and functions with the bare minimum (movements, turning and speed control). 
+The code was built around an RC car (Version 1) designed by the UTTS (University of Toronto Technical Specialists) club as our first major design project. The car is designed using generative design, and functions with the bare minimum (movements, turning and speed control). 
 
 Future versions of the car will incorporate more sophisticated sensors and upgrades. 
 
