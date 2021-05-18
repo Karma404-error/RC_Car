@@ -11,7 +11,7 @@ Schematics of the RC_Car can be found here:
 
 The design of the car can be found here: 
 
-This version of the code uses the following Anroid App: https://play.google.com/store/apps/details?id=braulio.calle.bluetoothRCcontroller&hl=en&gl=US that runs at 115200 baud.
+This version of the code uses the following Android App: https://play.google.com/store/apps/details?id=braulio.calle.bluetoothRCcontroller&hl=en&gl=US that runs at 115200 baud.
 
 The App's documentation can be found here: https://sites.google.com/site/bluetoothrccar/home/4PuttingItAllTogetherAndTheAndroidApplication
 
