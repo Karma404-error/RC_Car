@@ -7,7 +7,7 @@ Future versions of the car will incorporate more sophisticated sensors and upgra
 
 This code supports the movement in all 8 directions, as well as speed control using the HC-05 Bluetooth Chip, two L298N Motor boards with regular DC motors, 4 battery packs (to supply 12V each to the Arduino MEGA and the chip, as well as the two boards)
 
-Schematics of the RC_Car can be found here: 
+Schematics of the RC_Car can be found here: ![circuit_schematic_bbFinal](https://user-images.githubusercontent.com/68342185/118872625-c1358180-b8b6-11eb-8e78-ffa4e1bfd0a7.png)
 
 The design of the car can be found here: 
 
