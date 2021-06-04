@@ -1,6 +1,7 @@
-/* This version of the code is the main wireless version uploaded onto the car
-   for the car to work. This works without the Serial monitor on the computer.
- */
+/*  This version of the code is for when the Computer is connecting to the Arduino
+    Via the Serial port, it is used to debug, examine and observe the signals coming to the 
+    HC-05 chip, as well as used to test and update any necessary code 
+*/
 
 //To drive a motor to a direction, say, clockwise, the pin Input 1 must be high 
 //while the pin Input 2 must be low. To drive the motor counter clockwise, 
@@ -9,25 +10,25 @@
 // Initialize front motors 1 and 2; Motor 1 is on the left and Motor 2 is on the right
 // When viewed from above the car with the car's front facing away from the observer
 // For speed control, must use PMW Pins: 3, 5, 6, 9, 10, 11
-int front_m1p1 = 7; // IN1 
-int front_m1p2 = 8; // IN2 
+int front_m1p1 = 7; // IN1
+int front_m1p2 = 8; // IN2
 int fm1_speed = 3; //Speed control for left front motor : ENA
 
-int front_m2p1 = 5; //IN3 
-int front_m2p2 = 4; //IN4 
+int front_m2p1 = 5; //IN3
+int front_m2p2 = 4; //IN4
 int fm2_speed = 6; //Speed control for right front motor : ENB
 
 // Initialize back motors 1 and 2; Motor 1 is on the left and Motor 2 is on the right
 // When viewed from above the car with the car's front facing away from the observer
-int back_m1p1 = 12; //IN1 
-int back_m1p2 = 10; //IN2 
+int back_m1p1 = 12; //IN1
+int back_m1p2 = 10; //IN2
 int bm1_speed = 9; //Speed control for left back motor : ENA
 
 int back_m2p1 = 25; //IN3 
-int back_m2p2 = 2; //IN4 
+int back_m2p2 = 2; //IN4
 int bm2_speed = 11; //Speed control for right back motor : ENB
 
-int led = 31; //LED to light up when a signal is detected by the HC-05
+int led = 31;
 
 //Initialize movement keyword variables
 String Forward = "Forward"; 
@@ -40,19 +41,27 @@ String Left = "Left";
 String f_Left = "Front Left";
 String b_Left = "Back Left";
 
-//Initialize max and min speeds of the car (255 -> 5 volts)
+//Initialize max, min, actual and reduced factor of the car (255 -> 5 volts)
 //Actual speed -> speed received from bluetooth module
 int max_speed = 255;
 int min_speed = 0;
 int actual_speed = min_speed; //Car begins stationary
 
-// Initialize bluetooth connection; RX pin 19; TX pin 18 -> arduino MEGA
-// RX pin receives data while TX pin transmits data
+/*
+// Delay values, can be altered and optimized during the testing phase
+int mini_delay = 100
+int short_delay = 300
+int medium_delay = 500
+int long_delay = 1000
+*/
+// Initialize bluetooth connection
+//SoftwareSerial Blue(19,18); // RX pin 19; TX pin 18 -> arduino MEGA
 char blueData; //Bluetooth data will be stored here
-//Locks used to eliminate the flood of "S" signals in the chip, to achieve smooth motion
 char lock1;
 char lock2;
-// Conversion and intData will be used for speed control and converting characters to integers
+// RX pin receives data while TX pin transmits data
+int counter = 0;
+int counter2 = 0;
 const int conversion = int('0');
 int intData;
 
@@ -75,13 +84,14 @@ void setup() {
   pinMode(bm2_speed, OUTPUT);
   pinMode(led, OUTPUT);
   
+  //Set up serial monitor
+  Serial.begin(9600);
+  Serial.write("Operational:");
   //Set up bluetooth signal and begin reading
   Serial1.begin(115200); 
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-
  if (Serial1.available()){
   lock1 = Serial1.read();
   digitalWrite(led, HIGH);
@@ -100,6 +110,13 @@ void loop() {
     blueData = lock1;
   }
   intData = int(blueData);
+  counter = counter + 1;
+  if (counter == 10){
+    Serial.println();
+    counter = 0;
+    }
+  Serial.write(blueData);
+  Serial.write("        ");
   
   if ((int(intData - conversion) >= 0) && (int(intData - conversion) <= 9)){
     //Multiply by 10 to get speed, then by 2.55 to convert from 0->100 to 0->255
@@ -156,8 +173,8 @@ void loop() {
       break;
     }
   }
-}
-
+ }
+ 
 //Function that changes the speed of the car wheels
 void speed_control(int speed_in){
   analogWrite(fm1_speed, speed_in); 
@@ -170,6 +187,7 @@ void speed_control(int speed_in){
 void movement(String Mode){
   if (Mode == Forward){
     // Front motor 1: Counter Clockwise, Front motor 2: Clockwise
+    //Serial.println("Entered the movement command: Forward");
     digitalWrite(front_m1p1, LOW);
     digitalWrite(front_m1p2, HIGH);
     digitalWrite(front_m2p1, HIGH);
