@@ -107,10 +107,6 @@ void loop() {
    }
    
   switch (blueData){
-    case ((conversion >= 0) && (conversion <= 9)):
-      speed_control(int(conversion * 25.5));
-      break;
-      
     case 'q':
       speed_control(max_speed);
       break;

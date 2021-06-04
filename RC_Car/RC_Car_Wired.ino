@@ -47,13 +47,6 @@ int max_speed = 255;
 int min_speed = 0;
 int actual_speed = min_speed; //Car begins stationary
 
-/*
-// Delay values, can be altered and optimized during the testing phase
-int mini_delay = 100
-int short_delay = 300
-int medium_delay = 500
-int long_delay = 1000
-*/
 // Initialize bluetooth connection
 //SoftwareSerial Blue(19,18); // RX pin 19; TX pin 18 -> arduino MEGA
 char blueData; //Bluetooth data will be stored here
@@ -124,10 +117,6 @@ void loop() {
    }
    
   switch (blueData){
-    case ((conversion >= 0) && (conversion <= 9)):
-      speed_control(int(conversion * 25.5));
-      break;
-      
     case 'q':
       speed_control(max_speed);
       break;
